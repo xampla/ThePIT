@@ -7,6 +7,8 @@ agents: it records what agents do on a machine (prompts, tool calls, commands, f
 hosts), scores the hosts they reach, runs detection rules, and shows alerts, a live
 event stream and an agent-to-host map. Sub-agents are tracked as their own nodes.
 
+![The PIT](docs/demo.gif)
+
 Sources: Claude Code (hooks + native telemetry), [Numbat](https://github.com/perplexityai/numbat),
 and any OpenTelemetry exporter using the GenAI conventions. Rules: a small built-in set,
 [Nova](https://github.com/Nova-Hunting/nova-framework) with the community

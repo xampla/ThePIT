@@ -7,3 +7,4 @@ nova-service/rules/
 nova-service/.venv/
 __pycache__/
 .claude/
+*.mov
