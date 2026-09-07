@@ -1,0 +1,8 @@
+node_modules
+dist
+data
+.git
+.claude
+nova-service/.venv
+nova-service/rules
+**/__pycache__

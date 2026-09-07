@@ -1,0 +1,14 @@
+services:
+  pit:
+    build: .
+    image: the-pit:latest
+    ports:
+      - "4318:4318"        # UI + API + ingest, all on one port
+    volumes:
+      - pit-data:/data     # settings, event history, reputation cache
+      - pit-models:/hf     # Nova's embedding model, downloaded once
+    restart: unless-stopped
+
+volumes:
+  pit-data:
+  pit-models:

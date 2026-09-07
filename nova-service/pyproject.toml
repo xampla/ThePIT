@@ -1,0 +1,33 @@
+[project]
+name = "pit-nova"
+version = "0.1.0"
+description = "Nova rule-engine sidecar for The PIT collector (managed over stdio, or HTTP when remote)"
+requires-python = ">=3.10"
+dependencies = [
+  "nova-hunting[semantic] @ git+https://github.com/Nova-Hunting/nova-framework",
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "torch>=2.2",
+]
+
+[project.scripts]
+pit-nova = "pit_nova.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["pit_nova"]
+
+# CPU-only torch: the semantic matcher is a small sentence-transformer; CUDA wheels add ~8 GB for nothing.
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

@@ -1,0 +1,29 @@
+{
+  "name": "pit",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The PIT \u2014 multi-agent observability and threat detection",
+  "type": "module",
+  "scripts": {
+    "setup": "npm install && sh nova-service/setup.sh",
+    "up": "npm run build && SERVE_UI=1 node server/index.ts",
+    "dev": "vite",
+    "collector": "node server/index.ts",
+    "nova": "cd nova-service && uv run pit-nova",
+    "build": "npm run typecheck && vite build",
+    "start": "SERVE_UI=1 node server/index.ts",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json",
+    "hooks:install": "node scripts/install-hooks.ts",
+    "hooks:remove": "node scripts/install-hooks.ts --remove",
+    "demo": "node scripts/demo.ts",
+    "ingest:sample": "node scripts/send-sample.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
