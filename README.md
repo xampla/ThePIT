@@ -95,3 +95,9 @@ scripts/       Claude Code hook, hook installer, demo generator
 nova-service/  Python sidecar around Nova (uv project)
 data/          runtime state (git-ignored)
 ```
+
+## License
+
+MIT. The rule engine it runs, [Nova](https://github.com/Nova-Hunting/nova-framework), and the
+community [nova-rules](https://github.com/Nova-Hunting/nova-rules) it ships with are MIT too,
+by Thomas Roccia and contributors.

@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "The PIT \u2014 multi-agent observability and threat detection",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "setup": "npm install && sh nova-service/setup.sh",
