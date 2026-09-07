@@ -15,8 +15,7 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json",
     "hooks:install": "node scripts/install-hooks.ts",
     "hooks:remove": "node scripts/install-hooks.ts --remove",
-    "demo": "node scripts/demo.ts",
-    "ingest:sample": "node scripts/send-sample.ts"
+    "demo": "node scripts/demo.ts"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

@@ -19,7 +19,6 @@ COPY --from=ui /app/dist ./dist
 COPY shared ./shared
 COPY server ./server
 COPY scripts ./scripts
-COPY samples ./samples
 COPY nova-service/pyproject.toml nova-service/uv.lock nova-service/README.md ./nova-service/
 COPY nova-service/pit_nova ./nova-service/pit_nova
 # community rules + Python deps (Nova, embedding stack); the embedding model itself is fetched on first start into /hf

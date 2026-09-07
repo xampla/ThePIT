@@ -91,7 +91,5 @@ shared/        normalisers and built-in rules used by collector and browser
 src/           browser UI (Vite, TypeScript)
 scripts/       Claude Code hook, hook installer, demo generator
 nova-service/  Python sidecar around Nova (uv project)
-samples/       Numbat and OTLP fixtures
 data/          runtime state (git-ignored)
-docs/          generated Nova rule table
 ```
