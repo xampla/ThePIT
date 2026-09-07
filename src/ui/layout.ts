@@ -97,7 +97,10 @@ export function sugiyama(nodes: LNode[], edges: LEdge[], rowMin: number): Layout
 
   // ---- coordinate assignment (two tiers: real nodes first, routed edges in the gaps between them)
   const y = new Map<string, number>();
-  const median = (vals: number[]) => { const v = [...vals].sort((p, q) => p - q); return v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : undefined; };
+  const median = (vals: (number | undefined)[]) => {
+    const v = vals.filter((n): n is number => typeof n === "number" && Number.isFinite(n)).sort((p, q) => p - q);
+    return v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : undefined;
+  };
   const reals = layers.map((L) => L.filter((n) => !n.dummy));
   // dummies between two consecutive real nodes (from the final order) need room of their own
   const between = new Map<string, number>();
@@ -125,6 +128,17 @@ export function sugiyama(nodes: LNode[], edges: LEdge[], rowMin: number): Layout
       const flush = (nextReal: Internal | null) => {
         if (!run.length) return;
         const clear = LABEL_CLEAR * rowMin, edge = EDGE_GAP * rowMin;
+        if (!prevReal && !nextReal) {
+          // nothing real in this layer: put each waypoint at the mean of the nodes it joins,
+          // falling back to an even spread while those are still unplaced
+          run.forEach((d, k) => {
+            const nb = [...(adjDown.get(d.id) ?? []), ...(adjUp.get(d.id) ?? [])]
+              .map((m) => y.get(m)).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+            y.set(d.id, nb.length ? nb.reduce((a, b) => a + b, 0) / nb.length : run.length === 1 ? 0.5 : k / (run.length - 1));
+          });
+          run = [];
+          return;
+        }
         if (prevReal && nextReal) {
           const lo = y.get(prevReal.id)!, hi = y.get(nextReal.id)!;
           const room = hi - lo;
@@ -185,11 +199,14 @@ export function sugiyama(nodes: LNode[], edges: LEdge[], rowMin: number): Layout
 
   // use the whole height: stretch the finished picture over the real nodes (alignment is kept,
   // gaps only grow); waypoints outside the range are clamped to the edge
-  const realYs = nodes.map((n) => y.get(n.id)!);
-  const lo = Math.min(...realYs), hi = Math.max(...realYs);
-  const stretch = (v: number) => Math.max(0, Math.min(1, hi - lo > 1e-6 ? (v - lo) / (hi - lo) : 0.5));
+  const realYs = nodes.map((n) => y.get(n.id)).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+  const lo = realYs.length ? Math.min(...realYs) : 0, hi = realYs.length ? Math.max(...realYs) : 1;
+  const stretch = (v: number | undefined) => {
+    if (typeof v !== "number" || !Number.isFinite(v)) return 0.5;
+    return Math.max(0, Math.min(1, hi - lo > 1e-6 ? (v - lo) / (hi - lo) : 0.5));
+  };
   const out: LayoutResult = { y: new Map(), via: new Map() };
-  for (const n of nodes) out.y.set(n.id, stretch(y.get(n.id)!));
-  for (const [k, d] of viaKey) out.via.set(k, stretch(y.get(d)!));
+  for (const n of nodes) out.y.set(n.id, stretch(y.get(n.id)));
+  for (const [k, d] of viaKey) out.via.set(k, stretch(y.get(d)));
   return out;
 }
