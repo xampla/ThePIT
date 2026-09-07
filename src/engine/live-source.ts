@@ -54,6 +54,9 @@ const SEV_OF_REP = (h: HostRecord): Severity => (h.pending ? "low" : h.rep < 25 
 /** Build a browser TraceEvent (with summary HTML) from a WireEvent. */
 export function toTraceEvent(w: WireEvent): TraceEvent {
   const agent = agentFromWire(w.agent);
+  // the tool histogram counts every named tool, including Bash (which arrives as a command
+  // event) and the file tools, so the panel reflects what the agent actually used
+  if (w.tool) bumpTool(w.tool);
   const hits: RuleHit[] = (w.rules ?? []).map((r) => ({ id: r.id, t: r.title, sev: r.sev, why: r.why, fix: r.fix ?? "Review the trace.", engine: r.engine, meta: r.meta }));
   const base = { ts: new Date(w.ts), sev: w.sev ?? "low", tag: w.tag, tool: w.tool, command: w.command, cwd: w.cwd, host: w.host, text: w.text, hits, detail: { ...(w.detail ?? {}), source: w.source } };
   let e: TraceEvent;
@@ -77,7 +80,6 @@ export function toTraceEvent(w: WireEvent): TraceEvent {
     if (fresh) emit("host:new", { host, agent });
     emit("packet", { agentId: agent.id, hostKey: host.h, sev });
   } else if (w.kind === "tool") {
-    if (w.tool) bumpTool(w.tool);
     const [head, ...rest] = w.label.split(" · ");
     e = mkEvent("tool", agent, { ...base, summary: rest.length ? `${esc(head)} · <b>${esc(rest.join(" · "))}</b>` : esc(w.label) });
   } else if (w.kind === "command") {

@@ -88,7 +88,13 @@ export async function applyNova(events: WireEvent[]): Promise<void> {
     const text = e.text.length > MAX_TEXT ? e.text.slice(0, MAX_TEXT) : e.text;
     const key = createHash("sha1").update(text).update(policyKey(cfg)).digest("hex");
     const hit = cache.get(key);
-    if (hit) { stats.cached++; const live = unmuted(e.agent.id, hit); if (live.length) publish({ t: "hits", eventId: e.id, hits: live }); continue; }
+    if (hit) {
+      stats.cached++;
+      const live = unmuted(e.agent.id, hit);
+      // attach to the event and the hits log as well, so a reload or restart keeps the alert
+      if (live.length) { e.rules = [...(e.rules ?? []), ...live]; appendHits(e.id, live); publish({ t: "hits", eventId: e.id, hits: live }); }
+      continue;
+    }
     pending.push({ e, key, text });
   }
   for (let i = 0; i < pending.length; i += BATCH_MAX) await scanBatch(pending.slice(i, i + BATCH_MAX), cfg);
